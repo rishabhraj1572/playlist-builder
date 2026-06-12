@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { decodePlaylistData, generateM3U } from "@/lib/playlist";
-import type { Channel } from "@/lib/types";
+import { decodePlaylistData, generateM3U } from "../../../lib/playlist";
+import type { Channel } from "../../../lib/types";
 
 function emptyResponse() {
   return new Response("#EXTM3U\n", {
