@@ -2,21 +2,16 @@
 
 A Vercel-ready Next.js app for managing lawful HLS/DASH stream entries in the browser and exporting a raw M3U playlist.
 
-## Features
+## Added features
 
-- Add / edit / delete channels
-- Logo URL, stream URL, type, group title, TVG ID
-- Optional HTTP metadata headers:
-  - origin
-  - referer
-  - cookie
-  - user-agent
-- Local browser JSON storage
-- Copy playlist URL
-- Copy M3U
-- Download M3U
-- Import / export JSON
-- Search/filter channels
+- Notes field per channel
+- Duplicate channel
+- Move up / down reorder
+- Bulk add from pasted text
+- Download JSON backup
+- Better stats
+- Notes exported into the M3U as comments
+- Search/filter across more fields
 
 ## Deploy on Vercel
 
@@ -26,6 +21,6 @@ A Vercel-ready Next.js app for managing lawful HLS/DASH stream entries in the br
 
 ## Notes
 
-- The app stores channel data in browser localStorage so it works without a database.
+- The app stores channel data in browser localStorage so it works without a separate database.
 - The `/api/playlist` route can generate a raw M3U from encoded JSON passed in the `data` query parameter.
-- Use this only for streams you are authorized to access.
+- Use this only with streams you are authorized to access.
