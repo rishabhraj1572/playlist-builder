@@ -159,28 +159,50 @@ export default function Page() {
       try {
         const parsed = JSON.parse(String(reader.result ?? "[]"));
         if (!Array.isArray(parsed)) throw new Error("Invalid JSON");
-        const normalized: Channel[] = parsed
+        const normalized = parsed
           .filter(Boolean)
-          .map((c: Partial<Channel>) => ({
+          .map((c: any): Channel => ({
             id: c.id ?? makeId(),
             name: c.name ?? "",
             logo: c.logo ?? "",
             url: c.url ?? "",
-            type: c.type === "dash" ? "dash" : "hls",
+        
+            type: (c.type === "dash" ? "dash" : "hls") as StreamType,
+        
             groupTitle: c.groupTitle ?? "",
             tvgId: c.tvgId ?? "",
             description: c.description ?? "",
+        
             origin: c.origin ?? "",
             referer: c.referer ?? "",
             cookie: c.cookie ?? "",
             userAgent: c.userAgent ?? "",
-            drmScheme: c.drmScheme ?? "none",
+        
+            drmScheme:
+              c.drmScheme === "clearkey" ||
+              c.drmScheme === "widevine" ||
+              c.drmScheme === "playready"
+                ? c.drmScheme
+                : "none",
+        
             licenseUrl: c.licenseUrl ?? "",
             clearKey: c.clearKey ?? "",
-            createdAt: typeof c.createdAt === "number" ? c.createdAt : now(),
-            updatedAt: typeof c.updatedAt === "number" ? c.updatedAt : now()
+        
+            createdAt:
+              typeof c.createdAt === "number"
+                ? c.createdAt
+                : now(),
+        
+            updatedAt:
+              typeof c.updatedAt === "number"
+                ? c.updatedAt
+                : now()
           }))
-          .filter((c) => c.name.trim() && c.url.trim());
+          .filter(
+            (c: Channel) =>
+              c.name.trim().length > 0 &&
+              c.url.trim().length > 0
+          );
         setChannels(normalized);
         alert("Imported successfully.");
       } catch {
