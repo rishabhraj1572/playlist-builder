@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Channel, StreamType } from "@/lib/types";
+import type { Channel, StreamType } from "../lib/types";
 import { clearChannels, loadChannels, saveChannels } from "../lib/storage";
 import { encodePlaylistData, generateM3U } from "../lib/playlist";
 
