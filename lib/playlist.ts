@@ -43,49 +43,54 @@ export function generateM3U(channels: Channel[]) {
 
     out += `#EXTINF:-1 ${attrs.join(" ")},${safe(ch.name) || "Untitled Channel"}\n`;
 
-    if (ch.type === "dash") {
-      out += "#KODIPROP:inputstream.adaptive.manifest_type=mpd\n";
-    }
-
-    if (safe(ch.origin)) {
+    if (safe(ch.origin))
       out += `#EXTVLCOPT:http-origin=${safe(ch.origin)}\n`;
-    }
 
-    if (safe(ch.referer)) {
+    if (safe(ch.referer))
       out += `#EXTVLCOPT:http-referrer=${safe(ch.referer)}\n`;
-    }
 
-    if (safe(ch.cookie)) {
+    if (safe(ch.cookie))
       out += `#EXTVLCOPT:http-cookie=${safe(ch.cookie)}\n`;
-    }
 
-    if (safe(ch.userAgent)) {
+    if (safe(ch.userAgent))
       out += `#EXTVLCOPT:http-user-agent=${safe(ch.userAgent)}\n`;
-    }
 
-    if (ch.drmScheme === "clearkey" && ch.clearKey) {
+    // DASH
+    if (ch.type === "dash") {
       out += "#KODIPROP:inputstream=inputstream.adaptive\n";
       out += "#KODIPROP:inputstream.adaptive.manifest_type=mpd\n";
+    }
+
+    // ClearKey
+    if (
+      ch.drmScheme === "clearkey" &&
+      safe(ch.clearKey)
+    ) {
       out += "#KODIPROP:inputstream.adaptive.license_type=org.w3.clearkey\n";
-      out += `#KODIPROP:inputstream.adaptive.license_key=${ch.clearKey}\n`;
-    }
-    
-    if (ch.drmScheme === "widevine" && ch.licenseUrl) {
-      out += "#KODIPROP:inputstream=inputstream.adaptive\n";
-      out += "#KODIPROP:inputstream.adaptive.manifest_type=mpd\n";
-      out += "#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha\n";
-      out += `#KODIPROP:inputstream.adaptive.license_key=${ch.licenseUrl}\n`;
-    }
-    
-    if (ch.drmScheme === "playready" && ch.licenseUrl) {
-      out += "#KODIPROP:inputstream=inputstream.adaptive\n";
-      out += "#KODIPROP:inputstream.adaptive.manifest_type=mpd\n";
-      out += "#KODIPROP:inputstream.adaptive.license_type=com.microsoft.playready\n";
-      out += `#KODIPROP:inputstream.adaptive.license_key=${ch.licenseUrl}\n`;
+      out += `#KODIPROP:inputstream.adaptive.license_key=${safe(ch.clearKey)}\n`;
     }
 
+    // Widevine
+    if (
+      ch.drmScheme === "widevine" &&
+      safe(ch.licenseUrl)
+    ) {
+      out += "#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha\n";
+      out += `#KODIPROP:inputstream.adaptive.license_key=${safe(ch.licenseUrl)}\n`;
+    }
+
+    // PlayReady
+    if (
+      ch.drmScheme === "playready" &&
+      safe(ch.licenseUrl)
+    ) {
+      out += "#KODIPROP:inputstream.adaptive.license_type=com.microsoft.playready\n";
+      out += `#KODIPROP:inputstream.adaptive.license_key=${safe(ch.licenseUrl)}\n`;
+    }
+
+    // STREAM URL (ALWAYS LAST)
     out += `${safe(ch.url)}\n\n`;
   }
 
-  return out.trimEnd() + "\n";
+  return out;
 }
