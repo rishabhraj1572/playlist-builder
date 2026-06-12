@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { Channel, StreamType } from "../lib/types";
-import { clearChannels, loadChannels, saveChannels } from "../lib/storage";
-import { encodePlaylistData, generateM3U } from "../lib/playlist";
+import type { Channel, StreamType } from "@/lib/types";
+import { clearChannels, loadChannels, saveChannels } from "@/lib/storage";
+import { encodePlaylistData, generateM3U } from "@/lib/playlist";
 
 const emptyForm = (): Omit<Channel, "id" | "createdAt" | "updatedAt"> => ({
   name: "",
@@ -149,23 +149,18 @@ export default function Page() {
 
   function onImportJson(file: File) {
     const reader = new FileReader();
-  
     reader.onload = () => {
       try {
         const parsed = JSON.parse(String(reader.result ?? "[]"));
-  
-        if (!Array.isArray(parsed)) {
-          throw new Error("Invalid JSON");
-        }
-  
-        const normalized = parsed
+        if (!Array.isArray(parsed)) throw new Error("Invalid JSON");
+        const normalized: Channel[] = parsed
           .filter(Boolean)
-          .map((c: any): Channel => ({
+          .map((c: Partial<Channel>) => ({
             id: c.id ?? makeId(),
             name: c.name ?? "",
             logo: c.logo ?? "",
             url: c.url ?? "",
-            type: (c.type === "dash" ? "dash" : "hls") as StreamType,
+            type: c.type === "dash" ? "dash" : "hls",
             groupTitle: c.groupTitle ?? "",
             tvgId: c.tvgId ?? "",
             description: c.description ?? "",
@@ -173,31 +168,18 @@ export default function Page() {
             referer: c.referer ?? "",
             cookie: c.cookie ?? "",
             userAgent: c.userAgent ?? "",
-            createdAt:
-              typeof c.createdAt === "number"
-                ? c.createdAt
-                : now(),
-            updatedAt:
-              typeof c.updatedAt === "number"
-                ? c.updatedAt
-                : now()
+            createdAt: typeof c.createdAt === "number" ? c.createdAt : now(),
+            updatedAt: typeof c.updatedAt === "number" ? c.updatedAt : now()
           }))
-          .filter(
-            (c: Channel) =>
-              c.name.trim().length > 0 &&
-              c.url.trim().length > 0
-          );
-  
+          .filter((c) => c.name.trim() && c.url.trim());
         setChannels(normalized);
         alert("Imported successfully.");
-      } catch (err) {
-        console.error(err);
+      } catch {
         alert("Could not import JSON.");
       }
     };
-
-  reader.readAsText(file);
-}
+    reader.readAsText(file);
+  }
 
   function seedExample() {
     setChannels([
