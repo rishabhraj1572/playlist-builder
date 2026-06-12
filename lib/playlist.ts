@@ -63,8 +63,26 @@ export function generateM3U(channels: Channel[]) {
       out += `#EXTVLCOPT:http-user-agent=${safe(ch.userAgent)}\n`;
     }
 
-    if((ch as any).drmScheme && (ch as any).drmScheme!=="none") out += `#DRM:${(ch as any).drmScheme}|${(ch as any).licenseUrl||""}|${(ch as any).clearKey||""}\n`;
-    out += `${safe(ch.url)}\n\n`;
+    if (ch.drmScheme === "clearkey" && ch.clearKey) {
+      out += "#KODIPROP:inputstream=inputstream.adaptive\n";
+      out += "#KODIPROP:inputstream.adaptive.manifest_type=mpd\n";
+      out += "#KODIPROP:inputstream.adaptive.license_type=org.w3.clearkey\n";
+      out += `#KODIPROP:inputstream.adaptive.license_key=${ch.clearKey}\n`;
+    }
+    
+    if (ch.drmScheme === "widevine" && ch.licenseUrl) {
+      out += "#KODIPROP:inputstream=inputstream.adaptive\n";
+      out += "#KODIPROP:inputstream.adaptive.manifest_type=mpd\n";
+      out += "#KODIPROP:inputstream.adaptive.license_type=com.widevine.alpha\n";
+      out += `#KODIPROP:inputstream.adaptive.license_key=${ch.licenseUrl}\n`;
+    }
+    
+    if (ch.drmScheme === "playready" && ch.licenseUrl) {
+      out += "#KODIPROP:inputstream=inputstream.adaptive\n";
+      out += "#KODIPROP:inputstream.adaptive.manifest_type=mpd\n";
+      out += "#KODIPROP:inputstream.adaptive.license_type=com.microsoft.playready\n";
+      out += `#KODIPROP:inputstream.adaptive.license_key=${ch.licenseUrl}\n`;
+    }
   }
 
   return out.trimEnd() + "\n";
