@@ -83,6 +83,8 @@ export function generateM3U(channels: Channel[]) {
       out += "#KODIPROP:inputstream.adaptive.license_type=com.microsoft.playready\n";
       out += `#KODIPROP:inputstream.adaptive.license_key=${ch.licenseUrl}\n`;
     }
+
+    out += `${safe(ch.url)}\n\n`;
   }
 
   return out.trimEnd() + "\n";
