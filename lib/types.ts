@@ -1,4 +1,5 @@
 export type StreamType = "hls" | "dash";
+export type DrmScheme = "none" | "clearkey" | "widevine" | "playready";
 
 export type Channel = {
   id: string;
@@ -12,12 +13,14 @@ export type Channel = {
   groupTitle: string;
   tvgId: string;
   description: string;
-  notes: string;
 
   origin: string;
   referer: string;
   cookie: string;
   userAgent: string;
+  drmScheme: DrmScheme;
+  licenseUrl: string;
+  clearKey: string;
 
   createdAt: number;
   updatedAt: number;
