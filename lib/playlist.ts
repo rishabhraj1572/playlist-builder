@@ -1,21 +1,26 @@
-import type { Channel } from "@/lib/types";
+import type { Channel } from "./types";
 
 function esc(value: string) {
   return value.replaceAll("\\", "\\\\").replaceAll('"', '\\"').trim();
 }
 
 function safe(value: string) {
-  return value.trim();
+  return value?.trim?.() ?? "";
 }
 
+// Browser-safe encoding
 export function encodePlaylistData(channels: Channel[]) {
-  return Buffer.from(JSON.stringify(channels), "utf8").toString("base64url");
+  return encodeURIComponent(JSON.stringify(channels));
 }
 
+// Browser-safe decoding
 export function decodePlaylistData(data: string): Channel[] {
-  const raw = Buffer.from(data, "base64url").toString("utf8");
-  const parsed = JSON.parse(raw);
-  return Array.isArray(parsed) ? parsed : [];
+  try {
+    const parsed = JSON.parse(decodeURIComponent(data));
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 export function generateM3U(channels: Channel[]) {
@@ -23,10 +28,18 @@ export function generateM3U(channels: Channel[]) {
 
   for (const ch of channels) {
     const attrs: string[] = [];
-    if (safe(ch.tvgId)) attrs.push(`tvg-id="${esc(ch.tvgId)}"`);
-    if (safe(ch.name)) attrs.push(`tvg-name="${esc(ch.name)}"`);
-    if (safe(ch.logo)) attrs.push(`tvg-logo="${esc(ch.logo)}"`);
-    if (safe(ch.groupTitle)) attrs.push(`group-title="${esc(ch.groupTitle)}"`);
+
+    if (safe(ch.tvgId))
+      attrs.push(`tvg-id="${esc(ch.tvgId)}"`);
+
+    if (safe(ch.name))
+      attrs.push(`tvg-name="${esc(ch.name)}"`);
+
+    if (safe(ch.logo))
+      attrs.push(`tvg-logo="${esc(ch.logo)}"`);
+
+    if (safe(ch.groupTitle))
+      attrs.push(`group-title="${esc(ch.groupTitle)}"`);
 
     out += `#EXTINF:-1 ${attrs.join(" ")},${safe(ch.name) || "Untitled Channel"}\n`;
 
